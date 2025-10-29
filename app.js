@@ -3,6 +3,7 @@ const app = express();
 const mongoose = require('mongoose');
 const mongo_url = 'mongodb://127.0.0.1:27017/wanderlust';
 const Listing = require('./models/listing.js');
+const path = require('path');
 
 app.listen(8080, () => {
     console.log("server is listening");
@@ -12,19 +13,26 @@ app.get("/", (req, res) => {
     res.send("Hi Chops!");
 })
 
-app.get("/testListing", async (req, res) => {
-    const sampleListing = new Listing({
-        title: "a47",
-        description: "A very peaceful stay",
-        price: 1200,
-        location: "Panscheel Vihar",
-        country: "India"
-    });
+// app.get("/testListing", async (req, res) => {
+//     const sampleListing = new Listing({
+//         title: "a47",
+//         description: "A very peaceful stay",
+//         price: 1200,
+//         location: "Panscheel Vihar",
+//         country: "India"
+//     });
 
-    await sampleListing.save();
-    res.send("test successful! sample listing is added in the db")
+//     await sampleListing.save();
+//     res.send("test successful! sample listing is added in the db")
+// })
+
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+
+app.get("/listing", async (req, res) => {
+    const allListings = await Listing.find({});
+    res.render("listings/index", {allListings});
 })
-
 main().then(() => {
     console.log("connected to db");
 }).catch(err => {
