@@ -13,6 +13,16 @@ app.get("/", (req, res) => {
     res.send("Hi Chops!");
 })
 
+main().then(() => {
+    console.log("connected to db");
+}).catch(err => {
+    console.log(err);
+})
+
+async function main() {
+    await mongoose.connect(mongo_url);
+}
+
 // app.get("/testListing", async (req, res) => {
 //     const sampleListing = new Listing({
 //         title: "a47",
@@ -28,18 +38,20 @@ app.get("/", (req, res) => {
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+app.use(express.urlencoded({extended: true})); //this line tells the server to parse the link sent into an object
 
+//index route
 app.get("/listing", async (req, res) => {
     const allListings = await Listing.find({});
     res.render("listings/index", {allListings});
 })
-main().then(() => {
-    console.log("connected to db");
-}).catch(err => {
-    console.log(err);
+
+//show route
+app.get("/listings/:id", async(req, res) => {
+    let {id} = req.params;
+    const listing = await Listing.findById(id);
+    res.render("listings/show", {listing});
 })
 
-async function main() {
-    await mongoose.connect(mongo_url);
-}
+
 
